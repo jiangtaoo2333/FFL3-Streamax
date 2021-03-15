@@ -194,6 +194,8 @@ def inference(config, data_loader, model):
     with torch.no_grad():
         for i, (inp, target, meta) in enumerate(data_loader):
             data_time.update(time.time() - end)
+            inp = inp.cuda(config.GPUS[0])
+            target = target.cuda(config.GPUS[0])
             output = model(inp)
             score_map = output.data.cpu()
             preds = decode_preds(score_map, meta['center'], meta['scale'], [64, 64])

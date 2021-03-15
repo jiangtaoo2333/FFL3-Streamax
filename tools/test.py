@@ -25,14 +25,17 @@ def parse_args():
 
     parser = argparse.ArgumentParser(description='Train Face Alignment')
 
-    parser.add_argument('--cfg', help='experiment configuration filename',
-                        required=True, type=str)
-    parser.add_argument('--model-file', help='model parameters', required=True, type=str)
+    parser.add_argument('--cfg', help='configuration filename',
+                        default='None', type=str)
+    parser.add_argument('--model-file', help='model parameters',
+                        default='./output/FFL3/HRNet-106-Points/onlyMask.pth',type=str)
 
     args = parser.parse_args()
-    update_config(config, args)
-    return args
 
+    if os.path.exists(args.cfg):
+        update_config(config, args)
+
+    return args
 
 def main():
 
@@ -51,18 +54,20 @@ def main():
     config.defrost()
     config.MODEL.INIT_WEIGHTS = False
     config.freeze()
-    model = models.get_face_alignment_net(config)
+    # model = models.get_face_alignment_net(config)
 
     gpus = list(config.GPUS)
-    model = nn.DataParallel(model, device_ids=gpus).cuda()
+    # model = nn.DataParallel(model, device_ids=gpus).cuda()
 
+    device = torch.device('cuda:{}'.format(config.GPUS[0]))
+    model = torch.load(args.model_file,map_location=device)
     # load model
-    state_dict = torch.load(args.model_file)
-    if 'state_dict' in state_dict.keys():
-        state_dict = state_dict['state_dict']
-        model.load_state_dict(state_dict)
-    else:
-        model.module.load_state_dict(state_dict)
+    # state_dict = torch.load(args.model_file)
+    # if 'state_dict' in state_dict.keys():
+    #     state_dict = state_dict['state_dict']
+    #     model.load_state_dict(state_dict)
+    # else:
+    #     model.module.load_state_dict(state_dict)
 
     dataset_type = get_dataset(config)
 

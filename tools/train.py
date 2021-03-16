@@ -21,6 +21,7 @@ from lib.config import config, update_config
 from lib.datasets import get_dataset
 from lib.core import function
 from lib.utils import utils
+from lib.loss import AdaptiveWingLoss
 
 
 def parse_args():

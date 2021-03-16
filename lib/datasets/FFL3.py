@@ -51,6 +51,7 @@ class FFL3_Dataset(data.Dataset):
         self.rot_factor = cfg.DATASET.ROT_FACTOR
         self.label_type = cfg.MODEL.TARGET_TYPE
         self.flip = cfg.DATASET.FLIP
+        self.use_Box = cfg.DATASET.USE_BOX
 
         self.mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
         self.std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
@@ -71,6 +72,10 @@ class FFL3_Dataset(data.Dataset):
 
             minX,minY = pts.min(axis=0)
             maxX,maxY = pts.max(axis=0)
+
+            if self.use_Box:
+                bbox_path = image_path.replace('.jpg','.txt').replace('/picture_mask/','/bbox/')
+                minX, minY, maxX, maxY = np.genfromtxt(bbox_path)
 
         # get centor and scale
         if(1):
